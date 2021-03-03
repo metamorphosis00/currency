@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Currency;
+use App\Http\Resources\CurrencyCollection;
 
 class CurrencyController extends Controller
 {
@@ -15,20 +16,23 @@ class CurrencyController extends Controller
      */
     public function index()
     {
-        $currencies = Currency::paginate(15);
+        $currencies = new CurrencyCollection(Currency::all());
 
         return response()->json($currencies);
     }
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  string  $code
      * @return \Illuminate\Http\Response
      */
     public function show($code)
     {
-        $currency = Currency::where('name', $code);
+        $currency = Currency::where('name', $code)->first();
 
-        return response()->json($currency);
+        return response()->json([
+            'name' => $currency->name,
+            'rate' => $currency->rate
+        ]);
     }
 }
